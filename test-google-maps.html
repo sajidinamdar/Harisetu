@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Maps API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Google Maps API Test</h1>
+        <button id="testButton">Test Google Maps API</button>
+        <div id="result">Results will appear here...</div>
+    </div>
+
+    <script>
+        document.getElementById('testButton').addEventListener('click', function() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing Google Maps API...\n';
+            
+            // First, get the user's location
+            if (navigator.geolocation) {
+                resultDiv.innerHTML += 'Getting your location...\n';
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        
+                        resultDiv.innerHTML += `Your coordinates: ${latitude}, ${longitude}\n\n`;
+                        resultDiv.innerHTML += 'Fetching address from Google Maps API...\n';
+                        
+                        // Test the Google Maps API
+                        const apiKey = 'AIzaSyBEsYiV0HMCgii9cW3Trz7jO5yqIow1D8E';
+                        const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+                        
+                        fetch(url)
+                            .then(response => response.json())
+                            .then(data => {
+                                resultDiv.innerHTML += `API Response Status: ${data.status}\n\n`;
+                                
+                                if (data.status === 'OK') {
+                                    resultDiv.innerHTML += 'API is working correctly!\n\n';
+                                    resultDiv.innerHTML += 'First result:\n';
+                                    resultDiv.innerHTML += `Formatted Address: ${data.results[0].formatted_address}\n\n`;
+                                    resultDiv.innerHTML += 'Full response:\n';
+                                    resultDiv.innerHTML += JSON.stringify(data, null, 2);
+                                } else {
+                                    resultDiv.innerHTML += 'API returned an error.\n';
+                                    resultDiv.innerHTML += `Error message: ${data.error_message || 'No error message provided'}\n\n`;
+                                    resultDiv.innerHTML += 'Full response:\n';
+                                    resultDiv.innerHTML += JSON.stringify(data, null, 2);
+                                }
+                            })
+                            .catch(error => {
+                                resultDiv.innerHTML += `Error fetching data: ${error.message}\n`;
+                            });
+                    },
+                    function(error) {
+                        let errorMessage = 'Error getting your location: ';
+                        
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage += 'Location permission denied.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage += 'Location information unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage += 'Location request timed out.';
+                                break;
+                            default:
+                                errorMessage += 'Unknown error.';
+                                break;
+                        }
+                        
+                        resultDiv.innerHTML += errorMessage;
+                    }
+                );
+            } else {
+                resultDiv.innerHTML += 'Geolocation is not supported by your browser.';
+            }
+        });
+    </script>
+</body>
+</html>

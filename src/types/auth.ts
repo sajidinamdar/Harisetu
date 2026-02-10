@@ -2,6 +2,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   role: 'farmer' | 'officer' | 'expert' | string;
   village?: string;
   district?: string;

@@ -16,7 +16,7 @@ class Document(Base):
     __tablename__ = "documents"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String(50), ForeignKey("users.id"))
     title = Column(String(255))
     document_type = Column(String(50))
     content = Column(Text)

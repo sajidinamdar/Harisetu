@@ -25,7 +25,7 @@ class Product(Base):
     unit = Column(String(20))  # kg, g, piece, etc.
     location = Column(String(255))
     images = Column(JSON, nullable=True)  # Store as JSON array
-    seller_id = Column(Integer, ForeignKey("users.id"))
+    seller_id = Column(String(50), ForeignKey("users.id"))
     is_active = Column(Boolean, default=True)
     has_subsidy = Column(Boolean, default=False)
     subsidy_details = Column(Text, nullable=True)
@@ -39,7 +39,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
-    buyer_id = Column(Integer, ForeignKey("users.id"))
+    buyer_id = Column(String(50), ForeignKey("users.id"))
     total_amount = Column(Float)
     status = Column(String(20))  # pending, confirmed, shipped, delivered, cancelled
     shipping_address = Column(Text)

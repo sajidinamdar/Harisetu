@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  LogOut, User, Bell, Settings, ChevronDown, Home, ShoppingCart, 
-  FileText, Camera, AlertTriangle, Mic, MapPin, Thermometer, 
+import {
+  LogOut, User, Bell, Settings, ChevronDown, Home, ShoppingCart,
+  FileText, Camera, AlertTriangle, Mic, MapPin, Thermometer,
   Cloud, Sun, Moon, Wind, CloudRain, Menu, X, MessageSquare, FileCheck
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,9 +30,9 @@ const Dashboard: React.FC = () => {
     const weatherConditions = ['Sunny', 'Cloudy', 'Rainy', 'Windy'];
     const randomCondition = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
     const randomTemp = Math.floor(Math.random() * 10) + 25;
-    
+
     let icon;
-    switch(randomCondition) {
+    switch (randomCondition) {
       case 'Sunny':
         icon = <Sun className="h-8 w-8 text-yellow-400" />;
         break;
@@ -48,7 +48,7 @@ const Dashboard: React.FC = () => {
       default:
         icon = <Sun className="h-8 w-8 text-yellow-400" />;
     }
-    
+
     setCurrentWeather({
       temp: `${randomTemp}°C`,
       condition: randomCondition,
@@ -60,10 +60,10 @@ const Dashboard: React.FC = () => {
   // Animation variants for cards
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { 
+      transition: {
         duration: 0.5
       }
     },
@@ -92,10 +92,10 @@ const Dashboard: React.FC = () => {
       id: 'user-management',
       title: language === 'en' ? 'User Management' : 'वापरकर्ता व्यवस्थापन',
       subtitle: 'User Management',
-      description: language === 'en' 
+      description: language === 'en'
         ? 'Secure registration and login for farmers, officers, and experts with role-based access control.'
         : 'शेतकरी, अधिकारी आणि तज्ञांसाठी सुरक्षित नोंदणी आणि लॉगिन रोल-आधारित प्रवेश नियंत्रणासह.',
-      features: language === 'en' 
+      features: language === 'en'
         ? ['Multilingual Authentication', 'Profile Management', 'Role-based Access', 'Security Features']
         : ['बहुभाषिक प्रमाणीकरण', 'प्रोफाइल व्यवस्थापन', 'रोल-आधारित प्रवेश', 'सुरक्षा वैशिष्ट्ये'],
       icon: <User className="h-6 w-6 text-white" />,
@@ -107,10 +107,10 @@ const Dashboard: React.FC = () => {
       id: 'krushi-bazaar',
       title: language === 'en' ? 'KrushiBazaar' : 'कृषीबाज़ार',
       subtitle: 'KrushiBazaar',
-      description: language === 'en' 
+      description: language === 'en'
         ? 'Digital marketplace for seeds, tools, fertilizers with price comparison and subsidy information.'
         : 'बियाणे, साधने, खत यासाठी डिजिटल बाज़ारपेठ किंमत तुलना आणि अनुदान माहितीसह.',
-      features: language === 'en' 
+      features: language === 'en'
         ? ['Product Search & Buy/Sell', 'Price Comparison', 'Government Subsidies', 'Secure Payments']
         : ['उत्पादन खरेदी/विक्री', 'किंमत तुलना', 'सरकारी अनुदान', 'सुरक्षित पेमेंट'],
       icon: <ShoppingCart className="h-6 w-6 text-white" />,
@@ -122,10 +122,10 @@ const Dashboard: React.FC = () => {
       id: 'haritsetu-chat',
       title: language === 'en' ? 'HaritSetu Chat' : 'हरितसेतू चॅट',
       subtitle: 'HaritSetu Chat',
-      description: language === 'en' 
+      description: language === 'en'
         ? 'Real-time AI chatbot and human expert consultation in Marathi and English.'
         : 'मराठी आणि इंग्रजीमध्ये रियल-टाइम AI चॅटबॉट आणि तज्ञ सल्लामसलत.',
-      features: language === 'en' 
+      features: language === 'en'
         ? ['AI Chatbot Support', 'Expert Consultation', 'Multilingual Chat', 'Real-time Messaging']
         : ['AI चॅटबॉट', 'तज्ञ सल्ला', 'बहुभाषिक चॅट', 'रियल-टाइम संदेश'],
       icon: <MessageSquare className="h-6 w-6 text-white" />,
@@ -137,10 +137,10 @@ const Dashboard: React.FC = () => {
       id: 'agroalert',
       title: language === 'en' ? 'AgroAlert' : 'एग्रो अलर्ट',
       subtitle: 'AgroAlert',
-      description: language === 'en' 
+      description: language === 'en'
         ? 'Smart alerts for pests, weather conditions, and crop-related issues with risk analysis.'
         : 'कीड, हवामान परिस्थिती आणि पीक संबंधी समस्यांसाठी स्मार्ट अलर्ट जोखीम विश्लेषणासह.',
-      features: language === 'en' 
+      features: language === 'en'
         ? ['Weather Alerts', 'Pest Notifications', 'Risk Analysis', 'SMS & Push Alerts']
         : ['हवामान अलर्ट', 'कीड सूचना', 'जोखीम विश्लेषण', 'SMS आणि पुश अलर्ट'],
       icon: <Bell className="h-6 w-6 text-white" />,
@@ -152,10 +152,10 @@ const Dashboard: React.FC = () => {
       id: 'agriscan',
       title: language === 'en' ? 'AgriScan' : 'एग्री स्कॅन',
       subtitle: 'AgriScan',
-      description: language === 'en' 
+      description: language === 'en'
         ? 'AI-powered crop disease detection from images with diagnosis and treatment solutions.'
         : 'प्रतिमांवरून AI-संचालित पीक रोग शोध निदान आणि उपचार समाधानांसह.',
-      features: language === 'en' 
+      features: language === 'en'
         ? ['Image-based Diagnosis', 'Disease Detection', 'Treatment Suggestions', 'Multilingual Results']
         : ['प्रतिमा-आधारित निदान', 'रोग शोध', 'उपचार सूचना', 'बहुभाषिक परिणाम'],
       icon: <Camera className="h-6 w-6 text-white" />,
@@ -167,10 +167,10 @@ const Dashboard: React.FC = () => {
       id: 'agriconnect',
       title: language === 'en' ? 'AgriConnect' : 'एग्री कनेक्ट',
       subtitle: 'AgriConnect',
-      description: language === 'en' 
+      description: language === 'en'
         ? 'GPS-based discovery of nearby agricultural services including vets, shops, and banks.'
         : 'पशुवैद्य, दुकाने आणि बँकांसह जवळील कृषी सेवांचा GPS-आधारित शोध.',
-      features: language === 'en' 
+      features: language === 'en'
         ? ['Service Discovery', 'GPS Integration', 'Service Ratings', 'Contact Information']
         : ['सेवा शोध', 'GPS एकत्रीकरण', 'सेवा रेटिंग', 'संपर्क माहिती'],
       icon: <MapPin className="h-6 w-6 text-white" />,
@@ -216,7 +216,7 @@ const Dashboard: React.FC = () => {
 
       {/* Mobile menu button */}
       <div className="md:hidden fixed top-4 left-4 z-50">
-        <button 
+        <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           className="p-2 rounded-lg bg-gray-800 text-white"
         >
@@ -226,7 +226,7 @@ const Dashboard: React.FC = () => {
 
       {/* Mobile sidebar */}
       {mobileMenuOpen && (
-        <motion.div 
+        <motion.div
           className="fixed inset-0 z-40 bg-gray-900 bg-opacity-90 md:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -274,14 +274,14 @@ const Dashboard: React.FC = () => {
 
             <div className="flex items-center space-x-6">
               <LanguageSwitcher />
-              
+
               <div className="relative">
                 <button className="p-2 text-gray-300 hover:text-white hover:bg-gray-700 rounded-full relative">
                   <Bell className="w-6 h-6" />
                   <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
                 </button>
               </div>
-              
+
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
@@ -347,7 +347,7 @@ const Dashboard: React.FC = () => {
                   <p className="text-white font-medium">{currentWeather.location}</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center">
                 <div className="mr-4 bg-gray-700 p-3 rounded-lg">
                   {currentWeather.icon}
@@ -360,9 +360,9 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex space-x-3 mt-4 md:mt-0">
-                <motion.button 
+                <motion.button
                   onClick={() => navigate('/haritsetu-chat')}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center shadow-md"
                   whileHover={{ scale: 1.05 }}
@@ -371,7 +371,7 @@ const Dashboard: React.FC = () => {
                   <Mic className="h-5 w-5 mr-2" />
                   <span>Voice Assistant</span>
                 </motion.button>
-                <motion.button 
+                <motion.button
                   onClick={() => navigate('/agriscan')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md"
                   whileHover={{ scale: 1.05 }}
@@ -383,7 +383,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Agricultural Modules Section */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
@@ -394,11 +394,11 @@ const Dashboard: React.FC = () => {
                 {modules.length} {language === 'en' ? 'Modules' : 'मॉड्यूल्स'}
               </span>
             </h2>
-            
+
             {/* Modules Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {modules.map((module, index) => (
-                <motion.div 
+                <motion.div
                   key={module.id}
                   className={`bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-lg ${module.borderColor} transition-all duration-300`}
                   variants={cardVariants}
@@ -432,7 +432,7 @@ const Dashboard: React.FC = () => {
                         </div>
                       ))}
                     </div>
-                    <motion.button 
+                    <motion.button
                       onClick={() => navigate(module.path)}
                       className={`w-full px-4 py-2 bg-gradient-to-r ${module.color} text-white rounded-lg shadow-md text-sm font-medium`}
                       whileHover={{ scale: 1.02 }}
@@ -470,7 +470,6 @@ const Dashboard: React.FC = () => {
       <UserProfile
         isOpen={showUserProfile}
         onClose={() => setShowUserProfile(false)}
-        language={language}
       />
     </div>
   );

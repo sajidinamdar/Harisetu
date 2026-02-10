@@ -12,8 +12,8 @@ class ChatSession(Base):
     __tablename__ = "chat_sessions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    expert_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String(50), ForeignKey("users.id"))
+    expert_id = Column(String(50), ForeignKey("users.id"), nullable=True)
     chat_type = Column(String(20))
     title = Column(String(255), nullable=True)
     is_active = Column(Boolean, default=True)
@@ -30,7 +30,7 @@ class ChatMessage(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     session_id = Column(Integer, ForeignKey("chat_sessions.id"))
-    sender_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # Null for AI messages
+    sender_id = Column(String(50), ForeignKey("users.id"), nullable=True)  # Null for AI messages
     content = Column(Text)
     language = Column(String(10), default="en")
     is_ai_message = Column(Boolean, default=False)

@@ -63,123 +63,131 @@ WEATHER_API_URL = "https://api.openweathermap.org/data/2.5"
 # Helper function to get weather data from OpenWeatherMap API
 async def get_weather_data(lat: float, lon: float):
     """
-    In a real implementation, this would call the OpenWeatherMap API.
-    For this demo, we'll return mock data.
+    Fetch live weather data from OpenWeatherMap API.
     """
-    # For demo purposes, we'll return mock data
-    # In a real app, you would make an API call like:
-    # async with httpx.AsyncClient() as client:
-    #     response = await client.get(
-    #         f"{WEATHER_API_URL}/onecall",
-    #         params={
-    #             "lat": lat,
-    #             "lon": lon,
-    #             "exclude": "minutely",
-    #             "units": "metric",
-    #             "appid": WEATHER_API_KEY
-    #         }
-    #     )
-    #     if response.status_code != 200:
-    #         raise HTTPException(status_code=response.status_code, detail="Weather API error")
-    #     return response.json()
-    
-    # Mock data for demonstration
-    current_date = datetime.now()
-    
-    # Generate mock current weather
-    current = {
-        "date": current_date.isoformat(),
-        "temperature": 28.5,
-        "feels_like": 30.2,
-        "temp_min": 26.8,
-        "temp_max": 31.2,
-        "pressure": 1012,
-        "humidity": 65,
-        "weather_main": "Clear",
-        "weather_description": "clear sky",
-        "wind_speed": 3.5,
-        "wind_direction": 120,
-        "clouds": 10,
-        "icon": "01d"
-    }
-    
-    # Generate mock hourly forecast (24 hours)
-    hourly = []
-    for i in range(24):
-        hour_date = current_date + timedelta(hours=i)
-        temp = 28.5 + (5 * (0.5 - (i % 24) / 24))  # Temperature variation
+    async with httpx.AsyncClient() as client:
+        # Get onecall data (current, hourly, daily)
+        # Note: OpenWeatherMap One Call 3.0 requires a subscription, 
+        # but 2.5 is often still used. We'll use 2.5/onecall if possible, 
+        # or separate calls if One Call 3.0 is not available.
+        # Given the API key provided, we'll try to use the One Call 1.0/2.5 or 3.0 endpoint.
         
-        # Add some rain in the afternoon
-        rain_1h = None
-        if 13 <= i <= 16:
-            rain_1h = 0.5 + (i - 13) * 0.2
-        
-        hourly.append({
-            "date": hour_date.isoformat(),
-            "temperature": temp,
-            "feels_like": temp + 1.5,
-            "temp_min": temp - 1.0,
-            "temp_max": temp + 1.0,
-            "pressure": 1012 - (i % 5),
-            "humidity": 65 + (i % 20),
-            "weather_main": "Rain" if rain_1h else "Clear",
-            "weather_description": "light rain" if rain_1h else "clear sky",
-            "wind_speed": 3.5 + (i % 3),
-            "wind_direction": 120 + (i * 5) % 360,
-            "clouds": 10 + (i * 3) % 90,
-            "rain_1h": rain_1h,
-            "icon": "10d" if rain_1h else "01d"
-        })
-    
-    # Generate mock daily forecast (7 days)
-    daily = []
-    for i in range(7):
-        day_date = current_date + timedelta(days=i)
-        temp = 28.5 + (3 * (0.5 - (i % 7) / 7))  # Temperature variation
-        
-        # Add some rain on days 2 and 5
-        rain_1h = None
-        weather_main = "Clear"
-        weather_desc = "clear sky"
-        icon = "01d"
-        
-        if i == 2 or i == 5:
-            rain_1h = 2.5 if i == 2 else 5.0
-            weather_main = "Rain"
-            weather_desc = "moderate rain" if i == 2 else "heavy rain"
-            icon = "10d"
-        
-        daily.append({
-            "date": day_date.isoformat(),
-            "temperature": temp,
-            "feels_like": temp + 1.5,
-            "temp_min": temp - 2.0,
-            "temp_max": temp + 2.0,
-            "pressure": 1012 - (i % 5),
-            "humidity": 65 + (i % 20),
-            "weather_main": weather_main,
-            "weather_description": weather_desc,
-            "wind_speed": 3.5 + (i % 3),
-            "wind_direction": 120 + (i * 10) % 360,
-            "clouds": 10 + (i * 10) % 90,
-            "rain_1h": rain_1h,
-            "icon": icon
-        })
-    
-    # Generate agricultural advice based on weather
-    agricultural_advice = generate_agricultural_advice(current, daily)
-    
-    return {
-        "city": "Sample City",
-        "state": "Maharashtra",
-        "country": "IN",
-        "lat": lat,
-        "lon": lon,
-        "current": current,
-        "hourly": hourly,
-        "daily": daily,
-        "agricultural_advice": agricultural_advice
-    }
+        try:
+            # Try One Call 3.0 (most modern)
+            response = await client.get(
+                "https://api.openweathermap.org/data/3.0/onecall",
+                params={
+                    "lat": lat,
+                    "lon": lon,
+                    "exclude": "minutely",
+                    "units": "metric",
+                    "appid": WEATHER_API_KEY
+                }
+            )
+            
+            if response.status_code != 200:
+                # Fallback to 2.5 if 3.0 fails (often due to subscription differences)
+                response = await client.get(
+                    "https://api.openweathermap.org/data/2.5/onecall",
+                    params={
+                        "lat": lat,
+                        "lon": lon,
+                        "exclude": "minutely",
+                        "units": "metric",
+                        "appid": WEATHER_API_KEY
+                    }
+                )
+            
+            if response.status_code != 200:
+                # If both One Call versions fail, we could try getting current weather + forecast separately,
+                # but for this implementation we'll assume one of the One Call versions works or raise the error.
+                error_detail = response.json().get("message", "Unknown error")
+                raise HTTPException(status_code=response.status_code, detail=f"OpenWeatherMap API error: {error_detail}")
+            
+            data = response.json()
+            
+            # Extract and format the data to match our pydantic models
+            # Current
+            current_raw = data.get("current", {})
+            current = {
+                "date": datetime.fromtimestamp(current_raw.get("dt")).isoformat(),
+                "temperature": current_raw.get("temp"),
+                "feels_like": current_raw.get("feels_like"),
+                "temp_min": current_raw.get("temp"),  # OneCall current doesn't have min/max
+                "temp_max": current_raw.get("temp"),
+                "pressure": current_raw.get("pressure"),
+                "humidity": current_raw.get("humidity"),
+                "weather_main": current_raw.get("weather")[0].get("main"),
+                "weather_description": current_raw.get("weather")[0].get("description"),
+                "wind_speed": current_raw.get("wind_speed"),
+                "wind_direction": current_raw.get("wind_deg"),
+                "clouds": current_raw.get("clouds"),
+                "rain_1h": current_raw.get("rain", {}).get("1h"),
+                "icon": current_raw.get("weather")[0].get("icon")
+            }
+            
+            # Hourly (next 24 hours)
+            hourly = []
+            for h in data.get("hourly", [])[:24]:
+                hourly.append({
+                    "date": datetime.fromtimestamp(h.get("dt")).isoformat(),
+                    "temperature": h.get("temp"),
+                    "feels_like": h.get("feels_like"),
+                    "temp_min": h.get("temp"),
+                    "temp_max": h.get("temp"),
+                    "pressure": h.get("pressure"),
+                    "humidity": h.get("humidity"),
+                    "weather_main": h.get("weather")[0].get("main"),
+                    "weather_description": h.get("weather")[0].get("description"),
+                    "wind_speed": h.get("wind_speed"),
+                    "wind_direction": h.get("wind_deg"),
+                    "clouds": h.get("clouds"),
+                    "rain_1h": h.get("rain", {}).get("1h"),
+                    "icon": h.get("weather")[0].get("icon")
+                })
+            
+            # Daily (next 7 days)
+            daily = []
+            for d in data.get("daily", [])[:7]:
+                temp = d.get("temp", {})
+                daily.append({
+                    "date": datetime.fromtimestamp(d.get("dt")).isoformat(),
+                    "temperature": temp.get("day"),
+                    "feels_like": d.get("feels_like", {}).get("day"),
+                    "temp_min": temp.get("min"),
+                    "temp_max": temp.get("max"),
+                    "pressure": d.get("pressure"),
+                    "humidity": d.get("humidity"),
+                    "weather_main": d.get("weather")[0].get("main"),
+                    "weather_description": d.get("weather")[0].get("description"),
+                    "wind_speed": d.get("wind_speed"),
+                    "wind_direction": d.get("wind_deg"),
+                    "clouds": d.get("clouds"),
+                    "rain_1h": d.get("rain"), # Daily rain is often just 'rain' or 'snow'
+                    "icon": d.get("weather")[0].get("icon")
+                })
+            
+            # Generate agricultural advice based on live weather
+            agricultural_advice = generate_agricultural_advice(current, daily)
+            
+            # Get city name from coordinates (OpenWeatherMap doesn't provide it in One Call)
+            # For simplicity, we'll keep the placeholders or return coordinates
+            return {
+                "city": "Coordinates Location",
+                "state": None,
+                "country": "IN",
+                "lat": lat,
+                "lon": lon,
+                "current": current,
+                "hourly": hourly,
+                "daily": daily,
+                "agricultural_advice": agricultural_advice
+            }
+            
+        except Exception as e:
+            if isinstance(e, HTTPException):
+                raise e
+            raise HTTPException(status_code=500, detail=f"Unexpected error fetching weather data: {str(e)}")
 
 def generate_agricultural_advice(current: Dict[str, Any], daily: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Generate agricultural advice based on weather conditions"""

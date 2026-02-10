@@ -18,7 +18,7 @@ class AgriDocument(Base):
     file_path = Column(String(255), nullable=False)
     file_type = Column(String(20), nullable=False)  # pdf, jpg, png, docx, etc.
     upload_date = Column(DateTime, default=datetime.now)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String(50), ForeignKey("users.id"), nullable=True)
     
     # Relationships
     user = relationship("User", back_populates="agri_documents")

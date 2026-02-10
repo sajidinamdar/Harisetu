@@ -38,7 +38,7 @@ class UserWeatherPreference(Base):
     __tablename__ = "user_weather_preferences"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String(50), ForeignKey("users.id"))
     location = Column(String(255))
     alert_types = Column(JSON)  # Array of alert types the user wants to receive
     notification_method = Column(String(20))  # sms, push, email, all

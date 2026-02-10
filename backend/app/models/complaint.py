@@ -27,8 +27,8 @@ class Complaint(Base):
     location = Column(String(255))
     status = Column(String(20), default=ComplaintStatus.PENDING)
     priority = Column(String(20), default=ComplaintPriority.MEDIUM)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String(50), ForeignKey("users.id"))
+    assigned_to = Column(String(50), ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -42,7 +42,7 @@ class ComplaintUpdate(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     complaint_id = Column(Integer, ForeignKey("complaints.id"))
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String(50), ForeignKey("users.id"))
     comment = Column(Text)
     status_change = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

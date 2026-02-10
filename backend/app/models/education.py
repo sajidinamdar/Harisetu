@@ -76,7 +76,7 @@ class UserProgress(Base):
     __tablename__ = "user_progress"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String(50), ForeignKey("users.id"))
     course_id = Column(Integer, ForeignKey("courses.id"))
     completed_lessons = Column(JSON, default="{}")  # Store as JSON array
     completed_quizzes = Column(JSON, default="{}")  # Store as JSON array

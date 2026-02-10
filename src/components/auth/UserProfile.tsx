@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { User, Settings, LogOut, Shield, MapPin, Phone, Mail, Edit2, Save, X, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { getDistrictsList, getTalukasList, getVillagesList } from '../../data/maharashtraLocations';
 
 interface UserProfileProps {
   isOpen: boolean;
   onClose: () => void;
-  language: string;
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, language }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose }) => {
   const { user, logout, updateProfile } = useAuth();
+  const { language } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: user?.name || '',
@@ -19,11 +20,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, language }) 
     district: user?.district || '',
     taluka: user?.taluka || '',
   });
-  
+
   // Location dropdown data
-  const [districts, setDistricts] = useState<{value: string, label: string}[]>([]);
-  const [talukas, setTalukas] = useState<{value: string, label: string}[]>([]);
-  const [villages, setVillages] = useState<{value: string, label: string}[]>([]);
+  const [districts, setDistricts] = useState<{ value: string, label: string }[]>([]);
+  const [talukas, setTalukas] = useState<{ value: string, label: string }[]>([]);
+  const [villages, setVillages] = useState<{ value: string, label: string }[]>([]);
 
   // Load districts on component mount
   useEffect(() => {

@@ -37,11 +37,11 @@ const WelcomePage: React.FC = () => {
                 </svg>
               </div>
             </div>
-            
+
             <h1 className="text-4xl font-bold text-green-800 mb-3">{t('welcomePage', 'title')}</h1>
             <p className="text-xl text-green-600 mb-6">{t('welcomePage', 'subtitle')}</p>
             <p className="text-gray-600 max-w-md mx-auto mb-10">{t('welcomePage', 'description')}</p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-16">
               <button
                 onClick={() => setShowLoginModal(true)}
@@ -57,10 +57,10 @@ const WelcomePage: React.FC = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="max-w-6xl w-full mx-auto">
             <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">{t('welcomePage', 'features')}</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
               <div className="bg-white p-6 rounded-xl shadow-md">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
@@ -71,7 +71,7 @@ const WelcomePage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('welcomePage', 'feature1Title')}</h3>
                 <p className="text-gray-600">{t('welcomePage', 'feature1Desc')}</p>
               </div>
-              
+
               <div className="bg-white p-6 rounded-xl shadow-md">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,7 +81,7 @@ const WelcomePage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('welcomePage', 'feature2Title')}</h3>
                 <p className="text-gray-600">{t('welcomePage', 'feature2Desc')}</p>
               </div>
-              
+
               <div className="bg-white p-6 rounded-xl shadow-md">
                 <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,12 +92,12 @@ const WelcomePage: React.FC = () => {
                 <p className="text-gray-600">{t('welcomePage', 'feature3Desc')}</p>
               </div>
             </div>
-            
+
             <div className="bg-green-50 p-8 rounded-xl mb-16">
               <h2 className="text-2xl font-bold text-green-800 mb-4">{t('welcomePage', 'aboutTitle')}</h2>
               <p className="text-gray-700 leading-relaxed">{t('welcomePage', 'aboutDesc')}</p>
             </div>
-            
+
             <div className="bg-white p-6 rounded-xl shadow-md max-w-md mx-auto">
               <h3 className="font-semibold text-gray-900 mb-4 text-center">{t('welcomePage', 'demoAccounts')}</h3>
               <div className="space-y-2 text-sm text-gray-600">
@@ -207,7 +207,6 @@ const WelcomePage: React.FC = () => {
         isOpen={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
         onSwitchToLogin={handleSwitchToLogin}
-        language={language}
       />
     </>
   );

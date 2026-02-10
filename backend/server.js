@@ -29,14 +29,8 @@ app.use(express.static(path.join(__dirname, '../build')));
 // Test database connection
 testConnection();
 
-// Import routes
-const otpRoutes = require('./app/routes/otp_routes');
-
 // API routes
 app.use('/api/krushi-bazaar', krushiBazaarRoutes);
-
-// OTP authentication routes
-app.use('/api', otpRoutes);
 
 // Get all users (for testing)
 app.get('/api/users', async (req, res) => {
@@ -46,8 +40,8 @@ app.get('/api/users', async (req, res) => {
     res.json({ users });
   } catch (error) {
     console.error('Get Users Error:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Failed to get users',
       error: error.message
     });

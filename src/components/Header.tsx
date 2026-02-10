@@ -4,16 +4,18 @@
 
 
 import React, { useState } from 'react';
-import { AlignJustify, X, User, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, User, Globe, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './auth/LoginModal';
 import RegisterModal from './auth/RegisterModal';
 import UserProfile from './auth/UserProfile';
 import logoSvg from '../assets/logo.svg';
 
+import { Language } from '../translations';
+
 interface HeaderProps {
-  language: string;
-  setLanguage: (lang: string) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
@@ -151,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              {isMenuOpen ? <X size={24} /> : <AlignJustify size={24} />}
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
@@ -163,7 +165,7 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
                 <a href="#services" className="text-gray-700 hover:text-green-600 transition-colors">{t.services}</a>
                 <a href="#about" className="text-gray-700 hover:text-green-600 transition-colors">{t.about}</a>
                 <a href="#contact" className="text-gray-700 hover:text-green-600 transition-colors">{t.contact}</a>
-                
+
                 <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => setLanguage(language === 'en' ? 'mr' : 'en')}
@@ -219,18 +221,15 @@ const Header: React.FC<HeaderProps> = ({ language, setLanguage }) => {
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         onSwitchToRegister={handleSwitchToRegister}
-        language={language}
       />
       <RegisterModal
         isOpen={showRegisterModal}
         onClose={() => setShowRegisterModal(false)}
         onSwitchToLogin={handleSwitchToLogin}
-        language={language}
       />
       <UserProfile
         isOpen={showUserProfile}
         onClose={() => setShowUserProfile(false)}
-        language={language}
       />
     </>
   );

@@ -33,7 +33,7 @@ class ServiceReview(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     service_id = Column(Integer, ForeignKey("agri_services.id"))
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String(50), ForeignKey("users.id"))
     rating = Column(Integer)  # 1-5
     comment = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

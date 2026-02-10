@@ -37,7 +37,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 class UserBase(BaseModel):
     email: EmailStr
     name: str
-    phone: str
+    phone: Optional[str] = None
     role: str
     village: Optional[str] = None
     district: Optional[str] = None
@@ -56,7 +56,7 @@ class UserUpdate(BaseModel):
     department: Optional[str] = None
 
 class UserResponse(UserBase):
-    id: int
+    id: str
     verified: bool
     created_at: datetime
 
@@ -81,7 +81,7 @@ def authenticate_user(db: Session, email: str, password: str):
     user = db.query(User).filter(User.email == email).first()
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -141,7 +141,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
         email=user.email,
         name=user.name,
         phone=user.phone,
-        hashed_password=hashed_password,
+        password=hashed_password,
         role=user.role,
         village=user.village,
         district=user.district,

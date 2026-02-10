@@ -12,7 +12,7 @@ class FarmerQuery(Base):
     __tablename__ = "kisan_mitra_queries"
     
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    user_id = Column(String(50), ForeignKey("users.id"), nullable=True)
     question = Column(Text, nullable=False)
     response = Column(Text, nullable=False)
     language = Column(String(10), default="en")

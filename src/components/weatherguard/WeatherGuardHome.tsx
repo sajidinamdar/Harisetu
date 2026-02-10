@@ -1,178 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { weatherAPI } from '../../services/api';
 
-// Function to generate mock weather data
-const getMockWeatherData = (lat: number, lon: number): any => {
-  const currentDate = new Date();
-  
-  // Generate daily forecast for 7 days
-  const dailyForecast = Array(7).fill(0).map((_, index) => {
-    const forecastDate = new Date(currentDate);
-    forecastDate.setDate(forecastDate.getDate() + index);
-    
-    // Generate random but realistic weather data
-    const tempMax = 25 + Math.floor(Math.random() * 10);
-    const tempMin = tempMax - 5 - Math.floor(Math.random() * 5);
-    const humidity = 50 + Math.floor(Math.random() * 40);
-    const windSpeed = 5 + Math.floor(Math.random() * 15);
-    const clouds = Math.floor(Math.random() * 100);
-    
-    // Weather conditions based on random number
-    const weatherConditions = [
-      { main: 'Clear', description: 'clear sky', icon: '01d' },
-      { main: 'Clouds', description: 'scattered clouds', icon: '03d' },
-      { main: 'Clouds', description: 'broken clouds', icon: '04d' },
-      { main: 'Rain', description: 'light rain', icon: '10d' },
-    ];
-    
-    const weatherIndex = Math.floor(Math.random() * weatherConditions.length);
-    const weather = weatherConditions[weatherIndex];
-    
-    // Chance of rain
-    const hasRain = weather.main === 'Rain';
-    
-    return {
-      date: forecastDate.toISOString(),
-      temperature: tempMax - 2,
-      feels_like: tempMax - 3,
-      temp_min: tempMin,
-      temp_max: tempMax,
-      pressure: 1010 + Math.floor(Math.random() * 20),
-      humidity: humidity,
-      weather_main: weather.main,
-      weather_description: weather.description,
-      wind_speed: windSpeed,
-      wind_direction: Math.floor(Math.random() * 360),
-      clouds: clouds,
-      rain_1h: hasRain ? 1 + Math.random() * 5 : undefined,
-      rain_3h: hasRain ? 2 + Math.random() * 10 : undefined,
-      icon: weather.icon
-    };
-  });
-  
-  // Generate hourly forecast for 24 hours
-  const hourlyForecast = Array(24).fill(0).map((_, index) => {
-    const forecastDate = new Date(currentDate);
-    forecastDate.setHours(forecastDate.getHours() + index);
-    
-    // Generate random but realistic weather data
-    const temp = 22 + Math.floor(Math.random() * 8) + (index % 12 < 6 ? -3 : 3);
-    const humidity = 50 + Math.floor(Math.random() * 40);
-    const windSpeed = 5 + Math.floor(Math.random() * 10);
-    
-    // Weather conditions based on random number
-    const weatherConditions = [
-      { main: 'Clear', description: 'clear sky', icon: index < 12 ? '01d' : '01n' },
-      { main: 'Clouds', description: 'scattered clouds', icon: index < 12 ? '03d' : '03n' },
-      { main: 'Clouds', description: 'broken clouds', icon: index < 12 ? '04d' : '04n' },
-      { main: 'Rain', description: 'light rain', icon: index < 12 ? '10d' : '10n' },
-    ];
-    
-    const weatherIndex = Math.floor(Math.random() * weatherConditions.length);
-    const weather = weatherConditions[weatherIndex];
-    
-    // Chance of rain
-    const hasRain = weather.main === 'Rain';
-    
-    return {
-      date: forecastDate.toISOString(),
-      temperature: temp,
-      feels_like: temp - 1,
-      temp_min: temp - 2,
-      temp_max: temp + 2,
-      pressure: 1010 + Math.floor(Math.random() * 20),
-      humidity: humidity,
-      weather_main: weather.main,
-      weather_description: weather.description,
-      wind_speed: windSpeed,
-      wind_direction: Math.floor(Math.random() * 360),
-      clouds: Math.floor(Math.random() * 100),
-      rain_1h: hasRain ? Math.random() * 3 : undefined,
-      rain_3h: undefined,
-      icon: weather.icon
-    };
-  });
-  
-  // Generate crop-specific advice
-  const generalAdvice = [
-    'आजचे तापमान पिकांच्या वाढीसाठी योग्य आहे.',
-    'पुढील 3 दिवसांत पावसाची शक्यता आहे, कृपया पिकांचे नियोजन त्यानुसार करा.',
-    'सकाळी किंवा संध्याकाळी पाणी द्या, दुपारच्या उन्हात नको.',
-    'पिकांवर कीटकांचा प्रादुर्भाव तपासा आणि आवश्यक असल्यास नियंत्रण उपाय करा.'
-  ];
-  
-  const cropSpecificAdvice = {
-    rice: [
-      'तांदळाच्या पिकासाठी पाण्याची पातळी 2-3 सेमी ठेवा.',
-      'फुलोरा अवस्थेत पिकाला पाणी कमी करू नका.',
-      'पुढील आठवड्यात अपेक्षित पावसामुळे शेतात पाणी साचू शकते, निचरा व्यवस्था सुनिश्चित करा.'
-    ],
-    wheat: [
-      'गव्हाच्या पिकाला आता पाणी देणे महत्वाचे आहे.',
-      'तापमानातील बदल लक्षात घेता, दुपारच्या वेळी पिकावर पाणी फवारणी करा.',
-      'पुढील काही दिवसांत कमी तापमान अपेक्षित आहे, पिकाचे संरक्षण करा.'
-    ],
-    cotton: [
-      'कापसाच्या पिकावर फवारणी करताना हवामान स्थिती तपासा.',
-      'फुलांच्या अवस्थेत पिकाला नियमित पाणी द्या.',
-      'पुढील आठवड्यात अपेक्षित पावसामुळे कीटकांचा प्रादुर्भाव वाढू शकतो, निरीक्षण ठेवा.'
-    ],
-    vegetables: [
-      'भाज्यांना नियमित पाणी द्या, विशेषत: उच्च तापमानाच्या काळात.',
-      'सकाळी किंवा संध्याकाळी पाणी द्या, दुपारच्या उन्हात नको.',
-      'पुढील काही दिवसांत पावसाची शक्यता आहे, भाज्यांचे संरक्षण करा.'
-    ]
-  };
-  
-  // Generate alerts based on weather conditions
-  const alerts = [];
-  
-  if (dailyForecast.some(day => day.temp_max > 35)) {
-    alerts.push({
-      type: 'high_temperature',
-      message: 'पुढील काही दिवसांत उच्च तापमान अपेक्षित आहे. पिकांना वारंवार पाणी द्या.'
-    });
-  }
-  
-  if (dailyForecast.some(day => day.rain_1h && day.rain_1h > 10)) {
-    alerts.push({
-      type: 'heavy_rain',
-      message: 'जोरदार पावसाची शक्यता आहे. शेतातील पाण्याचा निचरा सुनिश्चित करा.'
-    });
-  }
-  
-  if (dailyForecast.every(day => !day.rain_1h)) {
-    alerts.push({
-      type: 'dry_spell',
-      message: 'पुढील आठवड्यात कोरडा कालावधी अपेक्षित आहे. पिकांना नियमित पाणी द्या.'
-    });
-  }
-  
-  // Generate planting recommendations
-  const plantingRecommendations = [
-    'सध्याच्या हवामानात पालेभाज्या लावण्यासाठी उत्तम काळ आहे.',
-    'फळझाडांची लागवड करण्यापूर्वी मातीची स्थिती तपासा.',
-    'बियाणे पेरण्यापूर्वी जमिनीची पूर्वतयारी करा.'
-  ];
-  
-  // Return complete weather forecast with agricultural advice
-  return {
-    city: '',  // Will be filled by reverse geocoding
-    state: '',
-    country: '',
-    lat: lat,
-    lon: lon,
-    current: dailyForecast[0],
-    hourly: hourlyForecast,
-    daily: dailyForecast,
-    agricultural_advice: {
-      general_advice: generalAdvice,
-      crop_specific: cropSpecificAdvice,
-      alerts: alerts,
-      planting_recommendations: plantingRecommendations
-    }
-  };
-};
 
 interface WeatherData {
   date: string;
@@ -221,7 +50,7 @@ const WeatherGuardHome: React.FC = () => {
   const [selectedCrop, setSelectedCrop] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'daily' | 'hourly'>('daily');
   const [usingCurrentLocation, setUsingCurrentLocation] = useState<boolean>(false);
-  
+
   const { user } = useAuth();
 
   // Fetch weather data when location changes
@@ -235,10 +64,10 @@ const WeatherGuardHome: React.FC = () => {
   useEffect(() => {
     setUsingCurrentLocation(true);
     setError('कृपया थांबा, आम्ही आपले स्थान शोधत आहोत...');
-    
+
     // Try to get location using Google Maps Geolocation API
     const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-    
+
     if (apiKey) {
       try {
         // Use Google Maps Geolocation API
@@ -249,31 +78,31 @@ const WeatherGuardHome: React.FC = () => {
           },
           body: JSON.stringify({})
         })
-        .then(response => response.json())
-        .then(data => {
-          if (data.location && data.location.lat && data.location.lng) {
-            const userLat = data.location.lat;
-            const userLon = data.location.lng;
-            
-            console.log(`Got user's location from Google API: ${userLat}, ${userLon}`);
-            
-            // Update location state with user's actual coordinates
-            setLocation({
-              lat: userLat,
-              lon: userLon
-            });
-            
+          .then(response => response.json())
+          .then(data => {
+            if (data.location && data.location.lat && data.location.lng) {
+              const userLat = data.location.lat;
+              const userLon = data.location.lng;
+
+              console.log(`Got user's location from Google API: ${userLat}, ${userLon}`);
+
+              // Update location state with user's actual coordinates
+              setLocation({
+                lat: userLat,
+                lon: userLon
+              });
+
+              setUsingCurrentLocation(false);
+              setError(null); // Clear error when we get location
+            } else {
+              throw new Error('Google Geolocation API did not return valid coordinates');
+            }
+          })
+          .catch(error => {
+            console.error('Error getting location from Google API:', error);
             setUsingCurrentLocation(false);
-            setError(null); // Clear error when we get location
-          } else {
-            throw new Error('Google Geolocation API did not return valid coordinates');
-          }
-        })
-        .catch(error => {
-          console.error('Error getting location from Google API:', error);
-          setUsingCurrentLocation(false);
-          setError('आपले स्थान शोधण्यात अडचण आली आहे. कृपया पुन्हा प्रयत्न करा.');
-        });
+            setError('आपले स्थान शोधण्यात अडचण आली आहे. कृपया पुन्हा प्रयत्न करा.');
+          });
       } catch (error) {
         console.error('Error in Google Geolocation API fetch:', error);
         setUsingCurrentLocation(false);
@@ -289,43 +118,41 @@ const WeatherGuardHome: React.FC = () => {
   const fetchWeatherData = async (lat: number, lon: number) => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Get location name using reverse geocoding
+      // Get live weather data from our backend
+      const data = await weatherAPI.getForecastByCoords(lat, lon);
+
+      // Get location name using reverse geocoding (Google Geocoding API)
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-      
-      if (apiKey) {
-        // First get the location name
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${apiKey}`;
-        const geocodeResponse = await fetch(geocodeUrl);
-        const geocodeData = await geocodeResponse.json();
-        
-        // Generate mock weather data
-        const mockResponse = getMockWeatherData(lat, lon);
-        
-        // Update with real location data if available
-        if (geocodeData.results && geocodeData.results.length > 0) {
-          const addressComponents = geocodeData.results[0].address_components;
-          
-          for (const component of addressComponents) {
-            if (component.types.includes('locality')) {
-              mockResponse.city = component.long_name;
-            } else if (component.types.includes('administrative_area_level_1')) {
-              mockResponse.state = component.long_name;
-            } else if (component.types.includes('country')) {
-              mockResponse.country = component.long_name;
+
+      if (apiKey && data.city === 'Coordinates Location') {
+        try {
+          const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${apiKey}`;
+          const geocodeResponse = await fetch(geocodeUrl);
+          const geocodeData = await geocodeResponse.json();
+
+          if (geocodeData.results && geocodeData.results.length > 0) {
+            const addressComponents = geocodeData.results[0].address_components;
+
+            for (const component of addressComponents) {
+              if (component.types.includes('locality')) {
+                data.city = component.long_name;
+              } else if (component.types.includes('administrative_area_level_1')) {
+                data.state = component.long_name;
+              } else if (component.types.includes('country')) {
+                data.country = component.long_name;
+              }
             }
           }
+        } catch (err) {
+          console.warn('Reverse geocoding failed, using coordinates as city name.', err);
         }
-        
-        setForecast(mockResponse);
-      } else {
-        // If no API key, just use mock data without location name
-        const mockResponse = getMockWeatherData(lat, lon);
-        setForecast(mockResponse);
       }
+
+      setForecast(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching weather data');
       console.error(err);
     } finally {
       setLoading(false);
@@ -334,61 +161,22 @@ const WeatherGuardHome: React.FC = () => {
 
   const handleCitySearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!citySearch.trim()) {
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Use Google Maps Geocoding API to get coordinates for the city
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-      
-      if (apiKey) {
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(citySearch)}&key=${apiKey}`;
-        
-        const response = await fetch(geocodeUrl);
-        const data = await response.json();
-        
-        if (data.results && data.results.length > 0) {
-          const { lat, lng } = data.results[0].geometry.location;
-          
-          // Get weather data for these coordinates
-          const mockResponse = getMockWeatherData(lat, lng);
-          
-          // Get city name from geocoding result
-          const addressComponents = data.results[0].address_components;
-          let city = '';
-          let state = '';
-          let country = '';
-          
-          for (const component of addressComponents) {
-            if (component.types.includes('locality')) {
-              city = component.long_name;
-            } else if (component.types.includes('administrative_area_level_1')) {
-              state = component.long_name;
-            } else if (component.types.includes('country')) {
-              country = component.long_name;
-            }
-          }
-          
-          // Update forecast with real location data
-          mockResponse.city = city || citySearch;
-          mockResponse.state = state;
-          mockResponse.country = country;
-          
-          setForecast(mockResponse);
-          setLocation({ lat, lon: lng });
-        } else {
-          throw new Error('City not found');
-        }
-      } else {
-        throw new Error('Google Maps API key not available');
-      }
+      // Use our backend to search by city
+      const data = await weatherAPI.getForecastByCity(citySearch);
+
+      setForecast(data);
+      setLocation({ lat: data.lat, lon: data.lon });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An error occurred while searching for city');
       console.error(err);
     } finally {
       setLoading(false);
@@ -467,13 +255,13 @@ const WeatherGuardHome: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-2">हवामान रक्षक (WeatherGuard)</h1>
       <p className="text-lg mb-6">कृषी निर्णयांसाठी रिअल-टाइम हवामान अंदाज (Real-time weather forecasting for agricultural decisions)</p>
-      
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
-      
+
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
@@ -493,7 +281,7 @@ const WeatherGuardHome: React.FC = () => {
               </button>
             </form>
           </div>
-          
+
           <button
             onClick={handleUseCurrentLocation}
             disabled={usingCurrentLocation}
@@ -516,7 +304,7 @@ const WeatherGuardHome: React.FC = () => {
           </button>
         </div>
       </div>
-      
+
       {forecast && (
         <>
           {/* Current Weather */}
@@ -528,18 +316,18 @@ const WeatherGuardHome: React.FC = () => {
                   <p className="text-lg">{forecast.state}, {forecast.country}</p>
                   <p className="text-sm opacity-80">Lat: {forecast.lat.toFixed(4)}, Lon: {forecast.lon.toFixed(4)}</p>
                 </div>
-                
+
                 <div className="text-right">
                   <p className="text-sm">{formatDate(forecast.current.date)}</p>
                   <p className="text-sm">{formatTime(forecast.current.date)}</p>
                 </div>
               </div>
-              
+
               <div className="flex flex-col md:flex-row items-center justify-between mt-6">
                 <div className="flex items-center">
-                  <img 
-                    src={getWeatherIcon(forecast.current.icon)} 
-                    alt={forecast.current.weather_description} 
+                  <img
+                    src={getWeatherIcon(forecast.current.icon)}
+                    alt={forecast.current.weather_description}
                     className="w-20 h-20"
                   />
                   <div className="ml-4">
@@ -547,7 +335,7 @@ const WeatherGuardHome: React.FC = () => {
                     <p className="capitalize">{forecast.current.weather_description}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-4 md:mt-0">
                   <div>
                     <p className="text-sm opacity-80">Feels Like</p>
@@ -569,7 +357,7 @@ const WeatherGuardHome: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Weather Alerts */}
           {forecast.agricultural_advice.alerts.length > 0 && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
@@ -579,7 +367,7 @@ const WeatherGuardHome: React.FC = () => {
                 </svg>
                 Weather Alerts
               </h3>
-              
+
               <div className="space-y-2">
                 {forecast.agricultural_advice.alerts.map((alert, index) => (
                   <div key={index} className="flex items-start p-3 bg-white rounded-md shadow-sm">
@@ -594,7 +382,7 @@ const WeatherGuardHome: React.FC = () => {
               </div>
             </div>
           )}
-          
+
           {/* Forecast Tabs */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div className="flex border-b">
@@ -611,16 +399,16 @@ const WeatherGuardHome: React.FC = () => {
                 तासाभराचा अंदाज (Hourly Forecast)
               </button>
             </div>
-            
+
             <div className="p-4">
               {activeTab === 'daily' ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
                   {forecast.daily.map((day, index) => (
                     <div key={index} className="bg-gray-50 rounded-lg p-3 text-center">
                       <p className="font-medium">{formatDate(day.date)}</p>
-                      <img 
-                        src={getWeatherIcon(day.icon)} 
-                        alt={day.weather_description} 
+                      <img
+                        src={getWeatherIcon(day.icon)}
+                        alt={day.weather_description}
                         className="w-16 h-16 mx-auto"
                       />
                       <p className="capitalize text-sm">{day.weather_description}</p>
@@ -645,9 +433,9 @@ const WeatherGuardHome: React.FC = () => {
                     {forecast.hourly.slice(0, 24).map((hour, index) => (
                       <div key={index} className="bg-gray-50 rounded-lg p-3 text-center min-w-[100px]">
                         <p className="font-medium">{formatTime(hour.date)}</p>
-                        <img 
-                          src={getWeatherIcon(hour.icon)} 
-                          alt={hour.weather_description} 
+                        <img
+                          src={getWeatherIcon(hour.icon)}
+                          alt={hour.weather_description}
                           className="w-12 h-12 mx-auto"
                         />
                         <p className="text-lg font-medium">{hour.temperature.toFixed(1)}°C</p>
@@ -666,13 +454,13 @@ const WeatherGuardHome: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           {/* Agricultural Advice */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="md:col-span-2">
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-medium mb-4">शेती सल्ला (Agricultural Advice)</h3>
-                
+
                 <div className="mb-6">
                   <h4 className="font-medium text-gray-700 mb-2">सामान्य शिफारसी (General Recommendations)</h4>
                   <ul className="space-y-2">
@@ -686,10 +474,10 @@ const WeatherGuardHome: React.FC = () => {
                     ))}
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">पिक-विशिष्ट सल्ला (Crop-Specific Advice)</h4>
-                  
+
                   <div className="mb-3">
                     <select
                       value={selectedCrop}
@@ -704,7 +492,7 @@ const WeatherGuardHome: React.FC = () => {
                       ))}
                     </select>
                   </div>
-                  
+
                   {selectedCrop && (
                     <div className="bg-green-50 p-4 rounded-lg">
                       <h5 className="font-medium text-green-800 mb-2">
@@ -725,14 +513,14 @@ const WeatherGuardHome: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div>
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-xl font-medium mb-4">लागवड शिफारसी (Planting Recommendations)</h3>
-                
+
                 <div className="bg-green-50 p-4 rounded-lg">
                   <h4 className="font-medium text-green-800 mb-2">सध्याच्या हवामानासाठी योग्य पिके (Crops Suitable for Current Weather)</h4>
-                  
+
                   <ul className="space-y-3">
                     {forecast.agricultural_advice.planting_recommendations.map((crop, index) => (
                       <li key={index} className="flex items-center">
@@ -745,7 +533,7 @@ const WeatherGuardHome: React.FC = () => {
                       </li>
                     ))}
                   </ul>
-                  
+
                   <p className="mt-4 text-sm text-green-700">
                     या शिफारसी सध्याच्या हवामान पद्धती आणि अंदाजांवर आधारित आहेत.
                     नेहमी स्थानिक माती परिस्थिती आणि हंगामी वेळ विचारात घ्या.

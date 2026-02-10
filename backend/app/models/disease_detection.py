@@ -24,7 +24,7 @@ class DiseaseDetection(Base):
     __tablename__ = "disease_detections"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    user_id = Column(String(50), ForeignKey("users.id"))
     image_url = Column(String(255))
     crop_type = Column(String(100), nullable=True)
     detected_disease_id = Column(Integer, ForeignKey("crop_diseases.id"), nullable=True)

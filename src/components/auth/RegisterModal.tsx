@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { X, Eye, EyeOff, Mail, Lock, User, Phone, MapPin, Briefcase, AlertCircle, ArrowRight, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { getDistrictsList, getTalukasList, getVillagesList } from '../../data/maharashtraLocations';
 
 interface RegisterModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSwitchToLogin: () => void;
-  language: string;
 }
 
-const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitchToLogin, language }) => {
+const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitchToLogin }) => {
   const { register, isLoading, sendOTP, verifyOTP, registerWithOTP, setUser } = useAuth();
+  const { language } = useLanguage();
   const [registerMethod, setRegisterMethod] = useState<'email' | 'phone'>('phone');
   const [step, setStep] = useState<'phone' | 'otp' | 'details' | 'email'>('phone');
   const [formData, setFormData] = useState({
@@ -40,11 +41,11 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Location dropdown data
-  const [districts, setDistricts] = useState<{value: string, label: string}[]>([]);
-  const [talukas, setTalukas] = useState<{value: string, label: string}[]>([]);
-  const [villages, setVillages] = useState<{value: string, label: string}[]>([]);
+  const [districts, setDistricts] = useState<{ value: string, label: string }[]>([]);
+  const [talukas, setTalukas] = useState<{ value: string, label: string }[]>([]);
+  const [villages, setVillages] = useState<{ value: string, label: string }[]>([]);
 
   // Load districts on component mount
   useEffect(() => {
@@ -194,17 +195,17 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!phone || phone.length < 10) {
       setError(t.invalidPhone);
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const response = await sendOTP(phone, 'signup');
-      
+
       if (response.success) {
         setStep('otp');
       }
@@ -222,17 +223,17 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!otp || otp.length < 4) {
       setError(t.invalidOTP);
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const response = await verifyOTP(phone, otp, 'signup');
-      
+
       if (response.success) {
         setStep('details');
       }
@@ -246,20 +247,20 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
   const handleRegisterWithOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!otpFormData.name) {
       setError('Name is required');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const response = await registerWithOTP({
         phone,
         ...otpFormData
       });
-      
+
       if (response.success && response.user) {
         // Save user data and close modal
         localStorage.setItem('haritsetu_user', JSON.stringify(response.user));
@@ -276,7 +277,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
   const handleResendOTP = async () => {
     setError('');
     setIsSubmitting(true);
-    
+
     try {
       await sendOTP(phone, 'signup');
     } catch (err: any) {
@@ -311,16 +312,16 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
           <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
-                {step === 'phone' ? t.title : 
-                 step === 'otp' ? t.otpTitle : 
-                 step === 'details' ? t.detailsTitle : 
-                 t.title}
+                {step === 'phone' ? t.title :
+                  step === 'otp' ? t.otpTitle :
+                    step === 'details' ? t.detailsTitle :
+                      t.title}
               </h2>
               <p className="text-gray-600 mt-1">
-                {step === 'phone' ? t.subtitle : 
-                 step === 'otp' ? t.otpSubtitle : 
-                 step === 'details' ? t.detailsSubtitle : 
-                 t.subtitle}
+                {step === 'phone' ? t.subtitle :
+                  step === 'otp' ? t.otpSubtitle :
+                    step === 'details' ? t.detailsSubtitle :
+                      t.subtitle}
               </p>
             </div>
             <button
@@ -383,7 +384,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                   </>
                 )}
               </button>
-              
+
               <div className="text-center">
                 <button
                   type="button"
@@ -498,7 +499,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t.taluka} <span className="text-gray-400 text-xs">(Optional)</span>
@@ -521,7 +522,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                     <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t.village} <span className="text-gray-400 text-xs">(Optional)</span>
@@ -553,7 +554,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
               >
                 {isSubmitting ? t.registering : t.register}
               </button>
-              
+
               <div className="text-center">
                 <button
                   type="button"
@@ -679,35 +680,32 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, role: 'farmer' })}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border ${
-                      formData.role === 'farmer' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
-                    }`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border ${formData.role === 'farmer' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
+                      }`}
                   >
                     <User className={`w-6 h-6 mb-1 ${formData.role === 'farmer' ? 'text-green-500' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${formData.role === 'farmer' ? 'text-green-700' : 'text-gray-700'}`}>
                       {t.farmer}
                     </span>
                   </button>
-                  
+
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, role: 'officer' })}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border ${
-                      formData.role === 'officer' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
-                    }`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border ${formData.role === 'officer' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
+                      }`}
                   >
                     <Briefcase className={`w-6 h-6 mb-1 ${formData.role === 'officer' ? 'text-green-500' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${formData.role === 'officer' ? 'text-green-700' : 'text-gray-700'}`}>
                       {t.officer}
                     </span>
                   </button>
-                  
+
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, role: 'expert' })}
-                    className={`flex flex-col items-center justify-center p-3 rounded-lg border ${
-                      formData.role === 'expert' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
-                    }`}
+                    className={`flex flex-col items-center justify-center p-3 rounded-lg border ${formData.role === 'expert' ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:bg-gray-50'
+                      }`}
                   >
                     <Briefcase className={`w-6 h-6 mb-1 ${formData.role === 'expert' ? 'text-green-500' : 'text-gray-400'}`} />
                     <span className={`text-sm font-medium ${formData.role === 'expert' ? 'text-green-700' : 'text-gray-700'}`}>
@@ -740,7 +738,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                       <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t.taluka}
@@ -763,7 +761,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                       <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t.village}
@@ -832,7 +830,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
               >
                 {isLoading ? t.creating : t.createAccount}
               </button>
-              
+
               <div className="text-center mt-4">
                 <button
                   type="button"
@@ -842,7 +840,7 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, onSwitch
                   {t.usePhone}
                 </button>
               </div>
-              
+
               <p className="mt-4 text-sm text-gray-600 text-center">
                 {t.terms}
               </p>

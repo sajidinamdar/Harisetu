@@ -1,10 +1,15 @@
 import React from 'react';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { translations } from '../translations';
+import { translations, Language } from '../translations';
 
-const Footer: React.FC = () => {
-  const { language, t } = useLanguage();
+interface FooterProps {
+  language?: Language;
+}
+
+const Footer: React.FC<FooterProps> = ({ language: propLanguage }) => {
+  const { language: contextLanguage, t } = useLanguage();
+  const language = propLanguage || contextLanguage;
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -42,21 +47,21 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="text-lg font-semibold mb-6">{t('footer', 'quickLinks')}</h4>
             <ul className="space-y-3">
-              {language === 'en' 
-                ? translations.footer.en.links.map((link: string, index: number) => (
-                    <li key={index}>
-                      <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                        {link}
-                      </a>
-                    </li>
-                  ))
-                : translations.footer.mr.links.map((link: string, index: number) => (
-                    <li key={index}>
-                      <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                        {link}
-                      </a>
-                    </li>
-                  ))
+              {language === 'en'
+                ? (translations.footer.en.links as string[]).map((link: string, index: number) => (
+                  <li key={index}>
+                    <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
+                      {link}
+                    </a>
+                  </li>
+                ))
+                : (translations.footer.mr.links as string[]).map((link: string, index: number) => (
+                  <li key={index}>
+                    <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
+                      {link}
+                    </a>
+                  </li>
+                ))
               }
             </ul>
           </div>
@@ -66,20 +71,20 @@ const Footer: React.FC = () => {
             <h4 className="text-lg font-semibold mb-6">{t('footer', 'services')}</h4>
             <ul className="space-y-3">
               {language === 'en'
-                ? translations.footer.en.servicesList.map((service: string, index: number) => (
-                    <li key={index}>
-                      <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                        {service}
-                      </a>
-                    </li>
-                  ))
-                : translations.footer.mr.servicesList.map((service: string, index: number) => (
-                    <li key={index}>
-                      <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
-                        {service}
-                      </a>
-                    </li>
-                  ))
+                ? (translations.footer.en.servicesList as string[]).map((service: string, index: number) => (
+                  <li key={index}>
+                    <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
+                      {service}
+                    </a>
+                  </li>
+                ))
+                : (translations.footer.mr.servicesList as string[]).map((service: string, index: number) => (
+                  <li key={index}>
+                    <a href="#" className="text-gray-400 hover:text-green-400 transition-colors duration-300">
+                      {service}
+                    </a>
+                  </li>
+                ))
               }
             </ul>
           </div>
@@ -91,25 +96,25 @@ const Footer: React.FC = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-green-400 mt-1 flex-shrink-0" />
                 <p className="text-gray-400">
-                  {language === 'en' 
-                    ? translations.footer.en.contactInfo.address 
-                    : translations.footer.mr.contactInfo.address}
+                  {language === 'en'
+                    ? (translations.footer.en.contactInfo as any).address
+                    : (translations.footer.mr.contactInfo as any).address}
                 </p>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="w-5 h-5 text-green-400 flex-shrink-0" />
                 <p className="text-gray-400">
-                  {language === 'en' 
-                    ? translations.footer.en.contactInfo.phone 
-                    : translations.footer.mr.contactInfo.phone}
+                  {language === 'en'
+                    ? (translations.footer.en.contactInfo as any).phone
+                    : (translations.footer.mr.contactInfo as any).phone}
                 </p>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="w-5 h-5 text-green-400 flex-shrink-0" />
                 <p className="text-gray-400">
-                  {language === 'en' 
-                    ? translations.footer.en.contactInfo.email 
-                    : translations.footer.mr.contactInfo.email}
+                  {language === 'en'
+                    ? (translations.footer.en.contactInfo as any).email
+                    : (translations.footer.mr.contactInfo as any).email}
                 </p>
               </div>
             </div>

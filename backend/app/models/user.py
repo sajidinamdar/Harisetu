@@ -8,11 +8,11 @@ from ..db import Base, engine
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String(50), primary_key=True, index=True)
     email = Column(String(255), unique=True, index=True)
     name = Column(String(255))
-    phone = Column(String(20))
-    hashed_password = Column(String(255))
+    phone = Column(String(20), nullable=True)
+    password = Column(String(255))
     role = Column(String(50))  # 'farmer', 'officer', 'expert'
     village = Column(String(255), nullable=True)
     district = Column(String(255), nullable=True)
@@ -39,6 +39,3 @@ class User(Base):
             self._expertise = json.dumps(value)
         else:
             self._expertise = None
-
-# Create all tables
-Base.metadata.create_all(bind=engine)
